@@ -21,4 +21,7 @@ function comp(fnOne::Any, fnTwo::Any, fnThree::Any)
   function f(x::Any)
     comp(fnOne, fnTwo)(fnThree(x))
   end
+  function f(x::Any, y...)
+    comp(fnOne, fnTwo)(fnThree(x))
+  end
 end
