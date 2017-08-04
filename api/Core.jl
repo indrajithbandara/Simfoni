@@ -27,5 +27,8 @@ function comp(fnOne::Any, fnTwo::Any)
 end
 
 function comp(fnOne::Any, fnTwo::Any, fnRest...)
-  reduce(comp, [fnOne, fnTwo, fnRest])
+  reduce(comp, unshift!(fnRest, fnOne, fnTwo))
 end
+
+
+# function f(x::Any, y::Any, z::Any, args...)
