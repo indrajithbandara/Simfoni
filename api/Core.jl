@@ -1,14 +1,18 @@
+function inc(x::Number)
+    x + 1
+end
+
 function comp()
   function f(x)
     identity(x)
   end
 end
 
-function comp(arg::Any)
-  arg
+function comp(fnOne::Function)
+  fnOne
 end
 
-function comp(fnOne::Any, fnTwo::Any)
+function comp(fnOne::Function, fnTwo::Function)
   function f()
     fnOne(fnTwo)
   end
@@ -26,9 +30,17 @@ function comp(fnOne::Any, fnTwo::Any)
   end
 end
 
-function comp(fnOne::Any, fnTwo::Any, fnRest...)
+function comp(fnOne::Function, fnTwo::Function, fnRest...)
   reduce(comp, unshift!(collect(fnRest), fnOne, fnTwo))
 end
 
 
-# function f(x::Any, y::Any, z::Any, args...)
+function str()
+  ""
+end
+
+function str(x...)
+    if is(x, nothing) # TODO add nil check
+        ""
+    else reduce(string, x) end
+end
