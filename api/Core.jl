@@ -39,8 +39,13 @@ function str()
   ""
 end
 
-function str(x...)
+function str(x:: Any)
     if is(x, nothing) # TODO add nil check
         ""
-    else reduce(string, x) end
+    else string(x)
+    end
+end
+
+function str(x:: Any, xs...)
+    reduce(string, unshift!(collect(xs), x)) # TODO fix nothings should be removed eg [1,nothing,3] => 13
 end
