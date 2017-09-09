@@ -31,7 +31,7 @@ function comp(fnOne::Function, fnTwo::Function)
 end
 
 function comp(fnOne::Function, fnTwo::Function, fnRest...)
-  reduce(comp, unshift!(collect(fnRest), fnOne, fnTwo))
+  reduce(comp, unshift!(convert(Array{Any}, collect(fnRest)), fnOne, fnTwo))
 end
 
 
@@ -40,12 +40,12 @@ function str()
 end
 
 function str(x:: Any)
-    if is(x, nothing) # TODO add nil check
+    if x === nothing
         ""
     else string(x)
     end
 end
 
 function str(x:: Any, xs...)
-    reduce(string, unshift!(collect(xs), x)) # TODO fix nothings should be removed eg [1,nothing,3] => 13
+    reduce(string, unshift!(collect(xs), x))
 end
