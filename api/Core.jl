@@ -11,10 +11,19 @@ function inc(x::Number)
     x + 1
 end
 
-function comp()
-  function f(x)
-    identity(x)
-  end
+function array_(x::Any, arg::Tuple)
+  v = unshift!(convert(Array{Any}, collect(arg)), x)
+  return v
+end
+
+function array_(x::Any, y::Any, arg::Tuple)
+  v = vunshift!(convert(Array{Any}, collect(arg)), x, y)
+  return v
+end
+
+function array_(x::Any, y::Any, z::Any, arg::Tuple)
+  v = unshift!(convert(Array{Any}, collect(arg)), x, y, z)
+  return v
 end
 
 """
@@ -31,30 +40,38 @@ julia> comp(parse, str, inc, x -> x * x)(2)
 ```
 """
 
+function comp()
+  function fn(x)
+    identity(x)
+  end
+end
+
 function comp(fnOne::Function)
   fnOne
 end
 
 function comp(fnOne::Function, fnTwo::Function)
-  function f()
+  function fn()
     fnOne(fnTwo)
   end
-  function f(x::Any)
+  function fn(x::Any)
     fnOne(fnTwo(x))
   end
-  function f(x::Any, y::Any)
+  function fn(x::Any, y::Any)
     fnOne(fnTwo(x, y))
   end
-  function f(x::Any, y::Any, z::Any)
+  function fn(x::Any, y::Any, z::Any)
     fnOne(fnTwo(x, y, z))
   end
-  function f(x::Any, y::Any, z::Any, args...)
-    fnOne(reduce(fnTwo, unshift!(collect(args), x, y, z)))
+  function fn(x::Any, y::Any, z::Any, args...)
+    v = unshift!(collect(args), x, y, z)
+    fnOne(reduce(fnTwo, v))
   end
 end
 
 function comp(fnOne::Function, fnTwo::Function, fnRest...)
-  reduce(comp, unshift!(convert(Array{Any}, collect(fnRest)), fnOne, fnTwo))
+  v = unshift!(convert(Array{Any}, collect(fnRest)), fnOne, fnTwo)
+  reduce(comp, v)
 end
 
 """
@@ -92,4 +109,52 @@ end
 
 function str(x:: Any, xs...)
     reduce(string, unshift!(collect(xs), x))
+end
+
+"""
+"""
+
+function apply(fn::Function, arg::Array{Any})
+  reduce(fn, arg)
+end
+
+function apply(fn::Function, x::Any, arg::Array{Any})
+  v = unshift!(arg, x)
+  reduce(fn, v)
+end
+
+function apply(fn::Function, y::Any, z::Any, x::Array{Any})
+  reduce(fn, arg)
+end
+
+function apply(fn::Function, y::Any, z::Any, j::Any, x::Array{Any})
+  reduce(fn, arg)
+end
+
+
+function apply(fn::Function, a::Any, b::Any, c::Any, d::Any, args...)
+  reduce(fn, arg)
+end
+
+
+################################################################################
+#Macros
+################################################################################
+using MacroTools
+
+"""
+Thread first
+"""
+macro >(exs...)
+  thread(x) = isexpr(x, :block) ? thread(rmlines(x).args...) : x
+
+  thread(x, ex) =
+    isexpr(ex, :call, :macrocall) ? Expr(ex.head, ex.args[1], x, ex.args[2:end]...) :
+    @capture(ex, f_.(xs__))       ? :($f.($x, $(xs...))) :
+    isexpr(ex, :block)            ? thread(x, rmlines(ex).args...) :
+    Expr(:call, ex, x)
+
+  thread(x, exs...) = reduce(thread, x, exs)
+
+  esc(thread(exs...))
 end
