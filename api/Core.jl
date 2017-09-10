@@ -11,13 +11,16 @@ function inc(x::Number)
     x + 1
 end
 
+"""
+Array_
+"""
 function array_(x::Any, arg::Tuple)
   v = unshift!(convert(Array{Any}, collect(arg)), x)
   return v
 end
 
 function array_(x::Any, y::Any, arg::Tuple)
-  v = vunshift!(convert(Array{Any}, collect(arg)), x, y)
+  v = unshift!(convert(Array{Any}, collect(arg)), x, y)
   return v
 end
 
@@ -25,6 +28,16 @@ function array_(x::Any, y::Any, z::Any, arg::Tuple)
   v = unshift!(convert(Array{Any}, collect(arg)), x, y, z)
   return v
 end
+
+function array_(arg::Tuple, args...)
+  any_arr = convert(Array{Any}, collect(arg))
+  for i in args
+    v = unshift!(any_arr, i)
+  end
+  return 1
+end
+
+
 
 """
 Takes a set of functions and returns a function that is the composition
@@ -123,16 +136,19 @@ function apply(fn::Function, x::Any, arg::Array{Any})
   reduce(fn, v)
 end
 
-function apply(fn::Function, y::Any, z::Any, x::Array{Any})
-  reduce(fn, arg)
+function apply(fn::Function, x::Any, y::Any, arg::Array{Any})
+  v = unshift!(arg, x, y)
+  reduce(fn, v)
 end
 
-function apply(fn::Function, y::Any, z::Any, j::Any, x::Array{Any})
-  reduce(fn, arg)
+function apply(fn::Function, x::Any, y::Any, z::Any, arg::Array{Any})
+  v = unshift!(arg, x, y, z)
+  reduce(fn, v)
 end
 
 
 function apply(fn::Function, a::Any, b::Any, c::Any, d::Any, args...)
+  v = unshift!(convert(Array{Any}, collect(args)), a, b, c, d)
   reduce(fn, arg)
 end
 
