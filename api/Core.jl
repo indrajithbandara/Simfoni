@@ -30,11 +30,7 @@ function array_(x::Any, y::Any, z::Any, arg::Tuple)
 end
 
 function array_(arg::Tuple, args...)
-  any_arr = convert(Array{Any}, collect(arg))
-  for i in args
-    v = unshift!(any_arr, i)
-  end
-  return 1
+  vcat(convert(Array{Any}, collect(args)), convert(Array{Any}, collect(arg)))
 end
 
 
@@ -77,14 +73,13 @@ function comp(fnOne::Function, fnTwo::Function)
     fnOne(fnTwo(x, y, z))
   end
   function fn(x::Any, y::Any, z::Any, args...)
-    v = unshift!(collect(args), x, y, z)
-    fnOne(reduce(fnTwo, v))
+    fnOne(reduce(fnTwo, array_(args, x, y, z)))
   end
 end
 
 function comp(fnOne::Function, fnTwo::Function, fnRest...)
-  v = unshift!(convert(Array{Any}, collect(fnRest)), fnOne, fnTwo)
-  reduce(comp, v)
+  #v = unshift!(convert(Array{Any}, collect(fnRest)), fnOne, fnTwo)
+  reduce(comp, array_(fnRest, fnOne, fnTwo))
 end
 
 """
@@ -125,31 +120,27 @@ function str(x:: Any, xs...)
 end
 
 """
+Apply
 """
-
+#TODO fix
 function apply(fn::Function, arg::Array{Any})
   reduce(fn, arg)
 end
 
 function apply(fn::Function, x::Any, arg::Array{Any})
-  v = unshift!(arg, x)
-  reduce(fn, v)
+  reduce(fn, array(arg, x))
 end
 
 function apply(fn::Function, x::Any, y::Any, arg::Array{Any})
-  v = unshift!(arg, x, y)
-  reduce(fn, v)
+  reduce(fn, array_(arg, x, y))
 end
 
 function apply(fn::Function, x::Any, y::Any, z::Any, arg::Array{Any})
-  v = unshift!(arg, x, y, z)
-  reduce(fn, v)
+  reduce(fn, array_(arg, x, y, z))
 end
 
-
 function apply(fn::Function, a::Any, b::Any, c::Any, d::Any, args...)
-  v = unshift!(convert(Array{Any}, collect(args)), a, b, c, d)
-  reduce(fn, arg)
+  return 1
 end
 
 
