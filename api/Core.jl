@@ -1,8 +1,3 @@
-
-# Custom conversions
-Base.convert(::Type{Array}, x::Tuple) = collect(x)
-
-
 """
 Returns a number one greater than the number applied
 
@@ -19,25 +14,33 @@ end
 
 
 """
-tuple_
+Creates a Vector{Any} containing the x's and y's
+prepended to arg
+
+# Examples
+```julia-repl
+julia> tuple_(tuple(4,5), 1,2,3)
+> [1, 2, 3, 4, 5]
+```
+
 """
-function tuple_(x::Any, arg::Tuple)
-  v = unshift!(convert(Array{Any}, collect(arg)), x)
+function tuple_(arg::Tuple, x::Any)
+  v = unshift!(collect(Any, arg), x)
   return v
 end
 
-function tuple_(x::Any, y::Any, arg::Tuple)
-  v = unshift!(convert(Array{Any}, collect(arg)), x, y)
+function tuple_(arg::Tuple, x::Any, y::Any)
+  v = unshift!(collect(Any, arg), x, y)
   return v
 end
 
-function tuple_(x::Any, y::Any, z::Any, arg::Tuple)
-  v = unshift!(convert(Array{Any}, collect(arg)), x, y, z)
+function tuple_(arg::Tuple, x::Any, y::Any, z::Any)
+  v = unshift!(collect(Any, arg), x, y, z)
   return v
 end
 
 function tuple_(arg::Tuple, args...)
-  vcat(convert(Array{Any}, collect(args)), convert(Array{Any}, collect(arg)))
+  vcat(collect(Any, args), collect(Any, arg))
 end
 
 
@@ -55,7 +58,6 @@ julia> comp(parse, str, inc, x -> x * x)(2)
 > 5
 ```
 """
-
 function comp()
   function fn(x)
     identity(x)
