@@ -1,3 +1,8 @@
+
+# Custom conversions
+Base.convert(::Type{Array}, x::Tuple) = collect(x)
+
+
 """
 Returns a number one greater than the number applied
 
@@ -11,25 +16,27 @@ function inc(x::Number)
     x + 1
 end
 
+
+
 """
-Array_
+tuple_
 """
-function array_(x::Any, arg::Tuple)
+function tuple_(x::Any, arg::Tuple)
   v = unshift!(convert(Array{Any}, collect(arg)), x)
   return v
 end
 
-function array_(x::Any, y::Any, arg::Tuple)
+function tuple_(x::Any, y::Any, arg::Tuple)
   v = unshift!(convert(Array{Any}, collect(arg)), x, y)
   return v
 end
 
-function array_(x::Any, y::Any, z::Any, arg::Tuple)
+function tuple_(x::Any, y::Any, z::Any, arg::Tuple)
   v = unshift!(convert(Array{Any}, collect(arg)), x, y, z)
   return v
 end
 
-function array_(arg::Tuple, args...)
+function tuple_(arg::Tuple, args...)
   vcat(convert(Array{Any}, collect(args)), convert(Array{Any}, collect(arg)))
 end
 
@@ -73,14 +80,15 @@ function comp(fnOne::Function, fnTwo::Function)
     fnOne(fnTwo(x, y, z))
   end
   function fn(x::Any, y::Any, z::Any, args...)
-    fnOne(reduce(fnTwo, array_(args, x, y, z)))
+    fnOne(reduce(fnTwo, tuple_(args, x, y, z)))
   end
 end
 
 function comp(fnOne::Function, fnTwo::Function, fnRest...)
-  #v = unshift!(convert(Array{Any}, collect(fnRest)), fnOne, fnTwo)
-  reduce(comp, array_(fnRest, fnOne, fnTwo))
+  reduce(comp, tuple_(fnRest, fnOne, fnTwo))
 end
+
+
 
 """
 With no arguments returns an empty string. With one argument, returns
@@ -119,6 +127,8 @@ function str(x:: Any, xs...)
     reduce(string, unshift!(collect(xs), x))
 end
 
+
+
 """
 Apply
 """
@@ -132,36 +142,13 @@ function apply(fn::Function, x::Any, arg::Array{Any})
 end
 
 function apply(fn::Function, x::Any, y::Any, arg::Array{Any})
-  reduce(fn, array_(arg, x, y))
+  reduce(fn, tuple_(arg, x, y))
 end
 
 function apply(fn::Function, x::Any, y::Any, z::Any, arg::Array{Any})
-  reduce(fn, array_(arg, x, y, z))
+  reduce(fn, tuple_(arg, x, y, z))
 end
 
 function apply(fn::Function, a::Any, b::Any, c::Any, d::Any, args...)
   return 1
-end
-
-
-################################################################################
-#Macros
-################################################################################
-using MacroTools
-
-"""
-Thread first
-"""
-macro >(exs...)
-  thread(x) = isexpr(x, :block) ? thread(rmlines(x).args...) : x
-
-  thread(x, ex) =
-    isexpr(ex, :call, :macrocall) ? Expr(ex.head, ex.args[1], x, ex.args[2:end]...) :
-    @capture(ex, f_.(xs__))       ? :($f.($x, $(xs...))) :
-    isexpr(ex, :block)            ? thread(x, rmlines(ex).args...) :
-    Expr(:call, ex, x)
-
-  thread(x, exs...) = reduce(thread, x, exs)
-
-  esc(thread(exs...))
 end
