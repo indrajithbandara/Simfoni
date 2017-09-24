@@ -16,3 +16,7 @@ macro >(exs...)
 
   esc(thread(exs...))
 end
+
+ """
+condition
+ """

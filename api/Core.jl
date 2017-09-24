@@ -24,22 +24,22 @@ julia> tuple_(tuple(4,5), 1,2,3)
 ```
 
 """
-function tuple_(arg::Tuple, x::Any)
+function tuple_(arg, x)
   v = unshift!(collect(Any, arg), x)
   return v
 end
 
-function tuple_(arg::Tuple, x::Any, y::Any)
+function tuple_(arg, x, y)
   v = unshift!(collect(Any, arg), x, y)
   return v
 end
 
-function tuple_(arg::Tuple, x::Any, y::Any, z::Any)
+function tuple_(arg, x, y, z)
   v = unshift!(collect(Any, arg), x, y, z)
   return v
 end
 
-function tuple_(arg::Tuple, args...)
+function tuple_(arg, args...)
   vcat(collect(Any, args), collect(Any, arg))
 end
 
@@ -64,29 +64,29 @@ function comp()
   end
 end
 
-function comp(fnOne::Function)
+function comp(fnOne)
   fnOne
 end
 
-function comp(fnOne::Function, fnTwo::Function)
+function comp(fnOne, fnTwo)
   function fn()
     fnOne(fnTwo)
   end
-  function fn(x::Any)
+  function fn(x)
     fnOne(fnTwo(x))
   end
-  function fn(x::Any, y::Any)
+  function fn(x, y)
     fnOne(fnTwo(x, y))
   end
-  function fn(x::Any, y::Any, z::Any)
+  function fn(x, y, z)
     fnOne(fnTwo(x, y, z))
   end
-  function fn(x::Any, y::Any, z::Any, args...)
+  function fn(x, y, z, args...)
     fnOne(reduce(fnTwo, tuple_(args, x, y, z)))
   end
 end
 
-function comp(fnOne::Function, fnTwo::Function, fnRest...)
+function comp(fnOne, fnTwo, fnRest...)
   reduce(comp, tuple_(fnRest, fnOne, fnTwo))
 end
 
@@ -118,14 +118,14 @@ function str()
   ""
 end
 
-function str(x:: Any)
+function str(x)
     if x === nothing
         ""
     else string(x)
     end
 end
 
-function str(x:: Any, xs...)
+function str(x, xs...)
     reduce(string, unshift!(collect(xs), x))
 end
 
@@ -135,22 +135,22 @@ end
 Apply
 """
 #TODO fix
-function apply(fn::Function, arg::Array{Any})
+function apply(fn, arg)
   reduce(fn, arg)
 end
 
-function apply(fn::Function, x::Any, arg::Array{Any})
+function apply(fn, x, arg)
   reduce(fn, array(arg, x))
 end
 
-function apply(fn::Function, x::Any, y::Any, arg::Array{Any})
+function apply(fn, x, y, arg)
   reduce(fn, tuple_(arg, x, y))
 end
 
-function apply(fn::Function, x::Any, y::Any, z::Any, arg::Array{Any})
+function apply(fn, x, y, z, arg)
   reduce(fn, tuple_(arg, x, y, z))
 end
 
-function apply(fn::Function, a::Any, b::Any, c::Any, d::Any, args...)
+function apply(fn, a, b, c, d, args...)
   return 1
 end
